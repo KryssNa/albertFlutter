@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "936648392999",
+    "firebase_url": "https://kryssna-16904-default-rtdb.firebaseio.com",
+    "project_id": "kryssna-16904",
+    "storage_bucket": "kryssna-16904.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936648392999:android:bf1cef1766149766b6a902",
+        "android_client_info": {
+          "package_name": "com.example.kryssna"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "936648392999-04phsmcok5bd1pgemlm3v5vhkabmkauu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDwcP9CtB57JR4nZAfBB1F2bLjUNYA6gI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "936648392999-04phsmcok5bd1pgemlm3v5vhkabmkauu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
