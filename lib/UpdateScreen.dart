@@ -1,5 +1,8 @@
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:kryssna/Models/ProductModel.dart';
 
 import 'Repos/productRepositery.dart';
 
@@ -19,12 +22,11 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   Future<void> update() async{
     try{
-      final data = {
-        "name" : _productName.text,
-        "description" : _productDescription.text,
-        "price" : double.parse(_productPrice.text),
-      };
-      await ProductRepository().updateProduct(data, _id);
+      ProductModel productModel = new ProductModel(
+        name: _productName.text,
+        price:double.parse(_productPrice.text),
+      );
+      await ProductRepository().updateProduct(productModel, _id);
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Data Updated")));
     }catch(e){
@@ -43,9 +45,8 @@ class _UpdateScreenState extends State<UpdateScreen> {
         data = response;
       });
 
-      _productName.text = response["name"];
-      _productDescription.text = response["description"];
-      _productPrice.text = response["price"].toString();
+      _productName.text = response.name.toString();
+      _productPrice.text = response.price.toString();
     }catch(e){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red, content: Text(e.toString())));
     }

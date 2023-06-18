@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:kryssna/Models/ProductModel.dart';
+import 'package:kryssna/ViewModel/ProductViewModel.dart';
+import 'package:provider/provider.dart';
 import 'Repos/productRepositery.dart';
 
 class DashBoardScreen extends StatefulWidget {
@@ -14,14 +16,12 @@ class DashBoardScreen extends StatefulWidget {
 class _DashBoardScreenState extends State<DashBoardScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  List<dynamic> data = [];
+  // List<QueryDocumentSnapshot<ProductModel>> productdata = [];
 
-  Future<void> fetch() async {
+  Future<void> fetchDataFromViewModel() async {
     try {
-      final getData = await ProductRepository().fetchProduct();
-      setState(() {
-        data = getData;
-      });
+      final getData = await productViewModel.fetch();
+
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(backgroundColor: Colors.red, content: Text(e.toString())));
@@ -32,7 +32,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     try {
       await ProductRepository().deleteProduct(id);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product deleted")));
-      fetch();
+      fetchDataFromViewModel();
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(backgroundColor: Colors.red, content: Text(e.toString())));
@@ -54,15 +54,18 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       ));
     }
   }
-
+  late ProductViewModel productViewModel;
   @override
   void initState() {
     // TODO: implement initState
-    fetch();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      productViewModel=Provider.of<ProductViewModel>(context,listen: false);
+    });
+    fetchDataFromViewModel();
     super.initState();
   }
 
-  void _showDialog(){
+  void _showDialog(String id){
     showDialog(context: context, builder: (context){
       return AlertDialog(
         title: Text("Delete"),
@@ -73,7 +76,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           }, child: Text("Delete")),
           ElevatedButton(onPressed: (){
             Navigator.of(context).pop();
-            // delete(_id);
+            delete(id);
+            // _showDialog(e.id);
           }, child: Text("Cancel")),
         ],
       );
@@ -82,71 +86,76 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Dashboard"),
-        actions: [IconButton(onPressed: signOut, icon: Icon(Icons.logout))],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed("/add-screen");
-        },
-        child: Icon(Icons.add),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<ProductViewModel>(
+      builder: (context,prouctVM,child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Dashboard"),
+            actions: [IconButton(onPressed: signOut, icon: Icon(Icons.logout))],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed("/add-screen");
+            },
+            child: Icon(Icons.add),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
               children: [
-                ElevatedButton(
-                    onPressed: () {
-                      fetch();
-                    },
-                    child: Text("Refresh")),
-                Column(
-                  children: [
-                    Text(data.length.toString(), style: TextStyle(fontSize: 20)),
-                    Text(" Data Found", style: TextStyle(fontSize: 20)),
-                  ],
-                )
-              ],
-            ),
-
-            ...data.map((e) => Card(
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          fetchDataFromViewModel();
+                        },
+                        child: Text("Refresh")),
                     Column(
                       children: [
-                        Text(e["name"]),
-                        Text("Rs. ${e['price']}"),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushNamed("/update-screen", arguments: e.id);
-                            },
-                            icon: Icon(Icons.edit)),
-                        IconButton(
-                            onPressed: () {
-                              delete(e.id);
-                            },
-                            icon: Icon(Icons.delete)),
+                        Text(prouctVM.productdata.length.toString(), style: TextStyle(fontSize: 20)),
+
+                        Text(" Data Found", style: TextStyle(fontSize: 20)),
                       ],
                     )
                   ],
                 ),
-              ),
-            ))
-          ],
-        ),
-      ),
+
+                ...prouctVM.productdata.map((e) => Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            Text(e.data().name.toString()),
+                            Text("Rs. ${e.data().price.toString()}"),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed("/update-screen", arguments: e.id);
+                                },
+                                icon: Icon(Icons.edit)),
+                            IconButton(
+                                onPressed: () {
+                                  delete(e.id);
+                                },
+                                icon: Icon(Icons.delete)),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ))
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 }

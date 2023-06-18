@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../Models/ProductModel.dart';
+
 class ProductRepository{
 
-  final instance = FirebaseFirestore.instance.collection("product");
+  final instance = FirebaseFirestore.instance.collection("product")
+  .withConverter(fromFirestore: (snapshot,_){
+    return ProductModel.fromFirebaseSnapshot(snapshot);
+  }, toFirestore:(model,_)=>model.toJson() );
 
-  Future<dynamic> createProduct(Map<String, dynamic> data) async {
+  Future<dynamic> createProduct(ProductModel data) async {
     try{
       final result = await instance.add(data);
       return result;
@@ -14,7 +19,7 @@ class ProductRepository{
     return null;
   }
 
-  Future<List<dynamic>> fetchProduct() async {
+  Future<List<QueryDocumentSnapshot<ProductModel>>> fetchAllProduct() async {
     try{
       final result = (await instance.get()).docs;
       return result;
@@ -24,19 +29,19 @@ class ProductRepository{
     return [];
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchSnapshot() {
+  Stream<QuerySnapshot<ProductModel>> fetchSnapshot() {
     final result = instance.snapshots();
     return result;
   }
 
-  Future<dynamic> fetchOneProduct(String id) async {
+  Future<ProductModel> fetchOneProduct(String id) async {
     try{
       final result = await instance.doc(id).get();
-      return result.data();
+      return result.data()!;
     }catch(error){
       print(error);
     }
-    return null;
+    return ProductModel();
   }
 
   Future<bool> deleteProduct(String id) async {
@@ -49,7 +54,7 @@ class ProductRepository{
     return false;
   }
 
-  Future<bool> updateProduct(Map<String, dynamic> data, String id) async {
+  Future<bool> updateProduct(ProductModel data, String id) async {
     try{
       print(id);
       final result = await instance.doc(id).set(data);

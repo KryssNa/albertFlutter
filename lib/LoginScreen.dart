@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _success = true;
           _uid = user.uid.toString();
+          Navigator.of(context).popAndPushNamed("/dasboard");
 
         });
       } else {

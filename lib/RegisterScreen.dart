@@ -22,6 +22,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void register() async {
     try {
+      await _auth.createUserWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Register Success"),
+        backgroundColor: Colors.green,
+      ));
+
+      Navigator.of(context).popAndPushNamed("/login");
       
     } on FirebaseAuthException catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

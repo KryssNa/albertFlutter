@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:kryssna/Models/ProductModel.dart';
 
 import 'Repos/productRepositery.dart';
 
@@ -18,11 +19,10 @@ class _AddScreenState extends State<AddScreen> {
 
   Future<void> save() async{
     try{
-      final data = {
-        "name" : _productName.text,
-        "description" : _productDescription.text,
-        "price" : double.parse(_productPrice.text),
-      };
+      ProductModel data = new ProductModel(
+        name: _productName.text,
+        price:double.parse(_productPrice.text),
+      );
       await ProductRepository().createProduct(data);
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Data Saved")));
