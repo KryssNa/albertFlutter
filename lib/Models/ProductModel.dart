@@ -17,17 +17,23 @@ class ProductModel {
   String? name;
   double? price;
   String? id;
+  String? imageUrl;
+  String? imagePath;
 
   ProductModel({
     this.name,
     this.price,
     this.id,
+    this.imageUrl,
+    this.imagePath
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
     name: json["name"],
     price: json["price"],
     id: json["id"],
+    imageUrl: json["imageUrl"],
+    imagePath: json["imagePath"]
   );
 
   factory ProductModel.fromFirebaseSnapshot(DocumentSnapshot doc){
@@ -40,5 +46,7 @@ class ProductModel {
     "name": name,
     "price": price,
     "id": id,
+    "imageUrl": imageUrl,
+    "imagePath": imagePath
   };
 }
