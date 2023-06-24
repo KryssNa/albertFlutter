@@ -19,6 +19,7 @@ class _NotificationDemoState extends State<NotificationDemo> {
 
        print(message.notification!.body);
        print(message.notification!.title);
+       NotificationService.displayFcm(notification: message.notification!);
 
      }
     });
