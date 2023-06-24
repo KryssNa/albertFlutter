@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
           "/dasboard": (context) => DashBoardScreen(),
           "/add-screen": (context) => AddScreen(),
           "/uploadImage": (context) => UploadImage(),
-          "/NotificationDemo": (context) => NotificationDemo(),
+          // "/NotificationDemo": (context) => NotificationDemo(),
         },
       ),
     );
