@@ -1,74 +1,47 @@
-# name: Dart
-
-# on:
-#   push:
-#     branches: [ "master" ]
-#   pull_request:
-#     branches: [ "master" ]
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - uses: actions/checkout@v3
-
-#       - name: Set up Flutter
-#         uses: subosito/flutter-action@v2
-#         with:
-#           flutter-version: stable
-#           channel: stable
-#           version: <valid-version>
-#           arch: x64
-
-
-#       - name: Install dependencies
-#         run: flutter pub get
-
-#       # Uncomment this step to verify the use of 'dart format' on each commit.
-#       # - name: Verify formatting
-#       #   run: dart format --output=none --set-exit-if-changed .
-
-#       # Consider passing '--fatal-infos' for slightly stricter analysis.
-#       - name: Analyze project source
-#         run: dart analyze
-
-#       # Your project will need to have tests in test/ and a dependency on
-#       # package:test for this step to succeed. Note that Flutter projects will
-#       # want to change this to 'flutter test'.
-#       - name: Run tests
-#         run: flutter test
-
 name: Dart CI
 
-on: [push]
+on:
+  [push]
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
 
     steps:
+      - name: Setup Dart SDK
+        run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            brew tap dart-lang/dart
+            brew install dart
+          else
+            choco install dart-sdk
+          fi
 
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-#       run: PATH="$PATH:/usr/lib/dart/bin" flutter pub get
-#     - name: Run tests
-#       run: PATH="$PATH:/usr/lib/dart/bin" pub run test
-#     - name: Run analyzer
-#       run: PATH="$PATH:/usr/lib/dart/bin" dartanalyzer --fatal-infos --fatal-warnings .
-#       if: always()
-#     - name: Run dartfmt
-#       run: PATH="$PATH:/usr/lib/dart/bin" dartfmt -n --set-exit-if-changed .
-#       if: always()
-      run: |
-        sudo apt-get update
-        sudo apt-get install apt-transport-https
-        sudo sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
-        sudo sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
-        sudo apt-get update
-        sudo apt-get -y install dart
-        sudo apt-get -y install flutter
+      - name: Setup Flutter SDK
+        run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            brew update
+            brew install --cask flutter
+          else
+            choco install flutter
+          fi
 
+      - uses: actions/checkout@v1
 
+      - name: Install dependencies
+        run: flutter pub get
 
+      - name: Run tests
+        run: flutter test
+
+      - name: Run analyzer
+        run: flutter analyze
+        if: always()
+
+      - name: Run dartfmt
+        run: flutter format --dry-run --set-exit-if-changed .
+        if: always()
