@@ -1,34 +1,28 @@
 name: Dart CI
 
 on:
-  [push]
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest]
+    runs-on: windows-latest
 
     steps:
       - name: Setup Dart SDK
         run: |
-          if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            brew tap dart-lang/dart
-            brew install dart
-          else
-            choco install dart-sdk
-          fi
+          curl https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-x64-release.zip -o dartsdk.zip
+          tar -xf dartsdk.zip
+          echo 'export PATH="$PATH:$PWD/dart-sdk/bin"' >> $PROFILE
+          refreshenv
 
       - name: Setup Flutter SDK
         run: |
-          if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            brew update
-            brew install --cask flutter
-          else
-            choco install flutter
-          fi
+          curl https://storage.googleapis.com/flutter_infra/releases/stable/windows/flutter_windows_2.8.0-stable.zip -o flutter.zip
+          tar -xf flutter.zip
+          echo 'export PATH="$PATH:$PWD/flutter/bin"' >> $PROFILE
+          refreshenv
 
       - uses: actions/checkout@v1
 
