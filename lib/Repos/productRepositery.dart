@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kryssna/services/FirebaseService.dart';
 
 import '../Models/ProductModel.dart';
 
 class ProductRepository{
 
-  final instance = FirebaseFirestore.instance.collection("product")
+  final instance = FirebaseService.db.collection("product")
   .withConverter(fromFirestore: (snapshot,_){
     return ProductModel.fromFirebaseSnapshot(snapshot);
-  }, toFirestore:(model,_)=>model.toJson() );
+  }, toFirestore:(ProductModel model,_)=>model.toJson() );
 
   Future<dynamic> createProduct(ProductModel data) async {
     try{
@@ -34,10 +35,10 @@ class ProductRepository{
     return result;
   }
 
-  Future<ProductModel> fetchOneProduct(String id) async {
+  Future<ProductModel?> fetchOneProduct(String id) async {
     try{
       final result = await instance.doc(id).get();
-      return result.data()!;
+      return result.data();
     }catch(error){
       print(error);
     }

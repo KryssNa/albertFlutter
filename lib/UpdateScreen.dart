@@ -45,8 +45,10 @@ class _UpdateScreenState extends State<UpdateScreen> {
         data = response;
       });
 
-      _productName.text = response.name.toString();
-      _productPrice.text = response.price.toString();
+      if(response!=null){
+        _productName.text = response.name.toString();
+        _productPrice.text = response.price.toString();
+      }
     }catch(e){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red, content: Text(e.toString())));
     }
